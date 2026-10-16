@@ -1,0 +1,336 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>서귀포시 복지계획 최종보고 · 인포그래픽 대시보드</title>
+<style>
+  :root{
+    --red:#e91d2a; --ink:#000; --canvas:#fff; --yellow:#fcc20f; --purple:#6a26a4; --link:#0000ee;
+    --olive:#8e8a25; --sage:#b3bd95; --salmon:#d77a7a; --peach:#e6915d;
+    --lime:#c0d4a7; --sky:#9ab6c8; --steel:#a5b8c0; --peri:#8c9ae0;
+    --sans:"Arial Black","Arial Bold",Arial,Helvetica,sans-serif;
+    --ui:Helvetica,Arial,sans-serif;
+    --serif:"Times New Roman",Times,serif;
+  }
+  *{box-sizing:border-box}
+  body{margin:0;background:var(--ink);font-family:var(--serif);color:var(--ink)}
+  .frame{background:var(--ink);padding:8px}
+  .page{background:var(--canvas);max-width:1100px;margin:0 auto}
+  /* top banner */
+  .banner{background:var(--ink);color:#fff;padding:12px 16px;display:flex;align-items:center;gap:16px;flex-wrap:wrap}
+  .banner h1{font-family:var(--ui);font-size:16px;font-weight:700;margin:0;letter-spacing:0;text-transform:uppercase}
+  .banner .sub{font-family:var(--serif);font-size:12px;color:#ddd}
+  .spacer{flex:1}
+  .sticker{background:var(--yellow);color:var(--ink);border:1px solid var(--ink);font-family:var(--ui);font-size:12px;font-weight:700;padding:4px 8px}
+  .sticker .a{background:var(--purple);color:#fff;padding:0 3px}
+  .phone{background:var(--ink);color:var(--red);font-family:var(--ui);font-size:16px;font-weight:700;padding:4px 8px}
+  /* nav */
+  nav{border-bottom:1px solid var(--ink);padding:8px 16px;display:flex;gap:4px;flex-wrap:wrap;background:#fff;position:sticky;top:0;z-index:20}
+  nav a{font-family:var(--ui);font-size:12px;font-weight:700;text-decoration:none;color:var(--ink);border:1px solid var(--ink);padding:6px 10px;background:#fff}
+  nav a.on{background:var(--ink);color:#fff}
+  /* sections */
+  section{padding:24px 16px 32px;border-bottom:1px solid var(--ink)}
+  .eyebrow{font-family:var(--sans);font-size:clamp(22px,4.4vw,36px);font-weight:900;line-height:1;padding:24px 16px;color:var(--ink)}
+  .e-olive{background:var(--olive);color:#fff}.e-salmon{background:var(--salmon)}
+  .e-sky{background:var(--sky)}.e-sage{background:var(--sage)}.e-peri{background:var(--peri)}
+  .e-peach{background:var(--peach)}.e-lime{background:var(--lime)}.e-steel{background:var(--steel)}
+  h2.kicker{font-family:var(--ui);font-size:14px;font-weight:700;text-transform:uppercase;margin:20px 0 8px}
+  p{font-size:14px;line-height:1.4;margin:8px 0}
+  .small{font-size:12px}.cap{font-size:11px;line-height:1.35}
+  /* ribbon card */
+  .ribbon{border:1px solid var(--ink);margin:12px 0}
+  .ribbon .t{background:#fff;border-bottom:1px solid var(--ink);font-family:var(--ui);font-size:14px;font-weight:700;padding:6px 12px;text-transform:uppercase}
+  .ribbon .b{padding:12px 16px;font-size:14px;line-height:1.4}
+  .b-sage{background:var(--sage)}.b-salmon{background:var(--salmon)}.b-peach{background:var(--peach)}
+  .b-lime{background:var(--lime)}.b-sky{background:var(--sky)}.b-steel{background:var(--steel)}.b-peri{background:var(--peri)}
+  .grid{display:grid;gap:12px}
+  .g2{grid-template-columns:repeat(auto-fit,minmax(260px,1fr))}
+  .g4{grid-template-columns:repeat(auto-fit,minmax(180px,1fr))}
+  /* stat */
+  .stat{border:1px solid var(--ink);padding:12px 16px;text-align:center;background:#fff}
+  .stat b{display:block;font-family:var(--sans);font-size:clamp(26px,5vw,40px);line-height:1;font-weight:900}
+  .stat span{font-family:var(--ui);font-size:12px;font-weight:700;display:block;margin-top:6px}
+  /* cta */
+  .cta{background:var(--red);color:#fff;border:1px solid var(--ink);padding:16px;font-size:14px;line-height:1.4}
+  /* table */
+  table{border-collapse:collapse;width:100%;margin:12px 0;background:#fff}
+  th{background:#fff;border-bottom:1px solid var(--ink);font-family:var(--ui);font-size:11px;font-weight:700;text-transform:uppercase;text-align:left;padding:6px 12px}
+  td{font-size:12px;line-height:1.4;padding:6px 12px;border-bottom:1px solid var(--ink)}
+  tr:nth-child(even) td{background:#f6f6f6}
+  /* bar chart */
+  .bars{margin:12px 0}
+  .bar{display:grid;grid-template-columns:72px 1fr 62px;align-items:center;gap:8px;margin:5px 0}
+  .bar .n{font-family:var(--ui);font-size:12px;font-weight:700}
+  .bar .track{background:#eee;border:1px solid var(--ink);height:20px}
+  .bar .fill{height:100%;width:0;transition:width .9s cubic-bezier(.2,.8,.2,1)}
+  .bar .v{font-size:12px;text-align:right}
+  .toggle{display:flex;gap:4px;margin:8px 0}
+  .toggle button{font-family:var(--ui);font-size:12px;font-weight:700;border:1px solid var(--ink);background:#fff;padding:6px 14px;cursor:pointer}
+  .toggle button.on{background:var(--ink);color:#fff}
+  .avg{font-size:11px;font-family:var(--ui);font-weight:700}
+  /* steps */
+  .step{border:1px solid var(--ink)}
+  .step .h{font-family:var(--ui);font-size:12px;font-weight:700;background:#fff;border-bottom:1px solid var(--ink);padding:6px 12px}
+  .step .big{font-family:var(--sans);font-size:20px;font-weight:900;padding:10px 12px 4px}
+  .step ul{margin:0;padding:0 12px 12px 28px;font-size:13px;line-height:1.45}
+  .step .f{border-top:1px solid var(--ink);padding:6px 12px;font-size:11px;background:#fff}
+  .note{border:1px solid var(--ink);background:var(--yellow);padding:10px 12px;font-size:12px;margin:12px 0}
+  .dark{background:var(--ink);color:#fff;padding:24px 16px}
+  .dark .q{font-family:var(--sans);font-size:clamp(18px,3.2vw,26px);line-height:1.25;font-weight:900}
+  .dark .card{border:1px solid #fff;padding:12px 16px}
+  .dark .card b{font-family:var(--ui);font-size:12px;display:block;margin-bottom:6px}
+  footer{padding:16px;font-size:12px}
+  footer a{color:var(--link)}
+  .seal{width:64px;height:64px;border-radius:9999px;background:var(--red);color:#fff;font-family:var(--ui);font-size:9px;font-weight:700;display:flex;align-items:center;justify-content:center;text-align:center;line-height:1.1;border:2px solid #000}
+  @media print{nav{display:none}}
+</style>
+</head>
+<body>
+<div class="frame"><div class="page">
+
+  <div class="banner">
+    <div>
+      <h1>SEOGWIPO WELFARE REPORT 2026</h1>
+      <div class="sub">읍면동별 기초생활보장 수급 현황 진단 및 취약계층 지원 계획 · 최종보고서 v2</div>
+    </div>
+    <div class="spacer"></div>
+    <div class="sticker">OPEN <span class="a">a</span> DATA</div>
+    <div class="phone">1-0-2-3-7</div>
+  </div>
+
+  <nav id="nav">
+    <a href="#s0" class="on">표지</a><a href="#s1">데이터 주의</a><a href="#s2">요약</a>
+    <a href="#s3">분석방법</a><a href="#s4">현황·규모</a><a href="#s5">조건부 비중</a>
+    <a href="#s6">유형분류</a><a href="#s7">추이 입장</a><a href="#s8">실행계획</a>
+    <a href="#s9">성과지표</a><a href="#s10">결론</a>
+  </nav>
+
+  <!-- 표지 -->
+  <section id="s0">
+    <div class="eyebrow e-olive">서귀포시 읍면동별<br>기초생활보장 수급 현황 진단</div>
+    <div class="grid g2" style="margin-top:24px">
+      <div class="cta">
+        규모만 보면 놓치는 지역이 생긴다.<br><br>
+        규모 · 조건부 비중 · 수급률을 함께 보고<br>
+        정비 → 조사 → 시범 → 확대 순서로 간다.
+      </div>
+      <div>
+        <div class="ribbon"><div class="t">최종보고서 v2</div><div class="b b-sage">작성일 2026-10-15 · 초안 + 반대의견서 + 검토의견 반영</div></div>
+        <div class="ribbon"><div class="t">분석 기준</div><div class="b b-sky">2024-04-30 공공데이터 원본. 가상데이터 연도 추세는 제외.</div></div>
+        <div class="ribbon"><div class="t">핵심 산출물</div><div class="b b-lime">읍면동 유형 분류(잠정) · 4단계 실행계획 · 성과지표</div></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- 데이터 주의사항 -->
+  <section id="s1">
+    <div class="eyebrow e-salmon">0. 데이터 주의사항</div>
+    <h2 class="kicker">분석에 쓴 자료와 쓰지 않은 자료</h2>
+    <table>
+      <tr><th>구분</th><th>내용</th><th>이 보고서의 처리</th></tr>
+      <tr><td>2024년 자료</td><td>공공데이터 원본 (2024-04-30 기준)</td><td><b>주 분석 자료로 사용</b></td></tr>
+      <tr><td>2020~2023년</td><td>배율·잡음으로 만든 교육용 가상데이터</td><td>추세 해석에 쓰지 않음</td></tr>
+      <tr><td>초안 2024년 표</td><td>보간값 4칸이 원본처럼 포함</td><td>원본 값으로 정정</td></tr>
+      <tr><td>2025년 자료</td><td>이상치 포함 (12,660 / 9999 / −139)</td><td>분석에서 제외</td></tr>
+      <tr><td>인구 자료</td><td>읍면동별 주민등록인구 미확보</td><td>수급률은 산출 예정</td></tr>
+    </table>
+    <div class="grid g2">
+      <div class="ribbon"><div class="t">그래서 이 보고서는</div><div class="b b-lime">2024년 한 시점의 구조 진단과 검증 가능한 실행계획에 집중한다.</div></div>
+      <div class="ribbon"><div class="t">뒤로 미룬 판단</div><div class="b b-steel">지역별 증가 속도 · 코로나 영향 — 실제 연도별 자료 확보 후 분석한다.</div></div>
+    </div>
+  </section>
+
+  <!-- 요약 -->
+  <section id="s2">
+    <div class="eyebrow e-sky">1. 요약 · 2024년 4월 기준</div>
+    <div class="grid g4" style="margin-top:16px">
+      <div class="stat"><b>7,197</b><span>수급가구</span></div>
+      <div class="stat"><b>10,237</b><span>수급권자(명)</span></div>
+      <div class="stat"><b>53.6%</b><span>상위 5개 지역 집중</span></div>
+      <div class="stat"><b>15.7%</b><span>시 평균 조건부 비중</span></div>
+    </div>
+    <div class="ribbon"><div class="t">① 규모</div><div class="b b-sage">일반수급자 82.2%(8,417명), 조건부 15.6%(1,598명), 특례 1.6%(161명), 시설 0.6%(61명).</div></div>
+    <div class="ribbon"><div class="t">② 집중</div><div class="b b-peach">동홍동·대정읍·성산읍·남원읍·대천동에 수급권자의 53.6%가 모여 있다.</div></div>
+    <div class="ribbon"><div class="t">③ 역전</div><div class="b b-salmon">조건부 비중은 중앙동(21.1%)·대륜동(20.9%)·효돈동(20.0%)·정방동(19.7%)이 높다.</div></div>
+    <div class="ribbon"><div class="t">④ 시설</div><div class="b b-steel">시설수급 61명 중 영천동 15명 — 지역 수요가 아니라 시설 소재지 효과.</div></div>
+    <div class="ribbon"><div class="t">⑤ 순서</div><div class="b b-peri">대규모 확대 대신 정비 → 조사 → 시범 → 확대.</div></div>
+  </section>
+
+  <!-- 분석 방법 -->
+  <section id="s3">
+    <div class="eyebrow e-sage">2. 분석 방법</div>
+    <h2 class="kicker">무엇을 어떻게 재는가</h2>
+    <table>
+      <tr><th>지표</th><th>산식</th><th>쓰임</th></tr>
+      <tr><td>수급자 규모</td><td>읍면동 수급권자 수</td><td>업무량·예산 총량</td></tr>
+      <tr><td>시 점유율</td><td>읍면동 ÷ 시 전체 × 100</td><td>자원 배분 비중</td></tr>
+      <tr><td>조건부 비중</td><td>조건부 ÷ (전체 − 시설) × 100</td><td>자활·고용 지원 필요도</td></tr>
+      <tr><td>가구당 수급권자</td><td>수급권자 ÷ 수급가구</td><td>평균 가구 규모 비교</td></tr>
+      <tr><td>전체 수급률 (예정)</td><td>수급권자 ÷ 주민등록인구 × 1,000</td><td>시 전체 규모 파악</td></tr>
+      <tr><td>재가 수급률 (예정)</td><td>(수급권자 − 시설) ÷ (인구 − 입소자) × 1,000</td><td>지역 우선순위 지표</td></tr>
+    </table>
+    <div class="cta">절대 규모만 보면 인구가 많은 지역에 자원이 계속 몰리고, 작은 지역의 높은 상대 취약성이 가려진다. 비율만 보면 업무량이 많은 지역의 인력이 부족해진다 → 규모와 비중을 함께 보고, 수급률 산출 후 최종 순위를 확정한다.</div>
+  </section>
+
+  <!-- 현황 규모 -->
+  <section id="s4">
+    <div class="eyebrow e-peach">3.1~3.3 현황 진단 · 규모</div>
+    <h2 class="kicker">읍면동별 수급권자 — 정렬 기준을 바꿔 보세요</h2>
+    <div class="toggle">
+      <button id="btnSize" class="on">수급권자 수</button>
+      <button id="btnRatio">조건부 비중(%)</button>
+    </div>
+    <div class="bars" id="bars"></div>
+    <p class="cap" id="caption">상위 5개 지역(동홍동·대정읍·성산읍·남원읍·대천동) 합계 5,487명 = 53.6%.</p>
+    <div class="grid g2">
+      <div class="ribbon"><div class="t">상위 5개 = 53.6%</div><div class="b b-salmon">상담·조사·사례관리 업무량도 이 지역에 몰릴 가능성이 크다.</div></div>
+      <div class="ribbon"><div class="t">확인할 것</div><div class="b b-lime">담당 공무원 1인당 사례 수 확인 후 인력 배치 조정. 성산읍 특례(10가구 / 9명) 역전 확인.</div></div>
+    </div>
+  </section>
+
+  <!-- 조건부 비중 -->
+  <section id="s5">
+    <div class="eyebrow e-steel">3.3 진단 결과 · 조건부 비중</div>
+    <h2 class="kicker">규모와 비중은 서로 다른 지역을 가리킨다</h2>
+    <div class="grid g4">
+      <div class="stat"><b>17.0%</b><span>동 지역 평균</span></div>
+      <div class="stat"><b>13.8%</b><span>읍면 지역 평균</span></div>
+      <div class="stat"><b>21.1%</b><span>중앙동 (최고)</span></div>
+      <div class="stat"><b>9.8%</b><span>영천동 (최저)</span></div>
+    </div>
+    <div class="grid g2">
+      <div class="ribbon"><div class="t">비중 최상위 그룹</div><div class="b b-salmon">중앙동·대륜동·효돈동·정방동 19~21% — 규모는 중간 이하, 비중은 최상위.</div></div>
+      <div class="ribbon"><div class="t">주의</div><div class="b b-peach">조건부수급자가 모두 바로 일할 수 있는 사람은 아니다. 건강·돌봄·일자리·교통을 개별 평가해야 한다.</div></div>
+    </div>
+    <div class="note">시설수급자는 주소가 시설 소재지로 잡히므로 조건부 비중·재가 수급률 계산에서 제외했다.</div>
+  </section>
+
+  <!-- 유형 분류 -->
+  <section id="s6">
+    <div class="eyebrow e-peri">3.4 지역 유형 분류 (잠정)</div>
+    <h2 class="kicker">규모 × 조건부 비중 4분면</h2>
+    <div class="grid g2">
+      <div class="ribbon"><div class="t">A · 규모 크고 비중 높음</div><div class="b b-salmon"><b>남원읍 · 대천동 · 표선면 · 대륜동 · 서홍동</b><br>자활·고용 연계 + 사례관리 인력 동시 보강</div></div>
+      <div class="ribbon"><div class="t">B · 규모 크고 비중 평균 이하</div><div class="b b-sage"><b>동홍동 · 대정읍 · 성산읍</b><br>일반수급자 사례관리·돌봄 중심, 업무량 기준 인력 배치</div></div>
+      <div class="ribbon"><div class="t">C · 규모 작고 비중 높음</div><div class="b b-peach"><b>중앙동 · 효돈동 · 정방동 · 송산동 · 예래동</b><br>인접 동을 묶은 공동 자활·고용 상담</div></div>
+      <div class="ribbon"><div class="t">D · 규모 작고 비중 평균 이하</div><div class="b b-sky"><b>중문동 · 안덕면 · 천지동 · 영천동</b><br>기본 사례관리 유지, 영천동은 시설 연계 별도 관리</div></div>
+    </div>
+    <p class="cap">기준: 규모 500명 이상 / 조건부 비중 시 평균 15.70% 초과(반올림 전 값 비교). 예래동(15.72%)·중문동(15.66%)은 경계 — 수급률 산출 후 우선 재검토.</p>
+  </section>
+
+  <!-- 추이 -->
+  <section id="s7">
+    <div class="eyebrow e-olive">4. 2020~2023년 추이에 대한 입장</div>
+    <div class="cta">“연 5%대 증가 후 2024년 둔화”, “대천동 25.08% 급증” — 이 해석은 생성 규칙과 잡음의 산물이다. 채택하지 않는다.</div>
+    <div class="grid g2">
+      <div class="ribbon"><div class="t">자료가 가상이다</div><div class="b b-steel">2024년 원본에 공통 배율(0.84·0.89·0.93·0.97)과 칸별 잡음을 곱해 생성. 지역별 증가율 차이는 잡음에서 나온다.</div></div>
+      <div class="ribbon"><div class="t">기대 증가율이 모두 같다</div><div class="b b-lime">1 ÷ 0.84 = 1.19 — 모든 읍면동의 2020→2024 기대 증가율이 약 19%로 동일하다.</div></div>
+      <div class="ribbon"><div class="t">한 해로 판단 못 한다</div><div class="b b-sage">실제 자료라도 한 해 수치로 구조적 안정기 진입을 판단하기 어렵다.</div></div>
+      <div class="ribbon"><div class="t">제도 변화를 빼고 볼 수 없다</div><div class="b b-sky">기준중위소득 조정, 부양의무자 기준 완화, 인구 이동을 함께 봐야 한다.</div></div>
+    </div>
+  </section>
+
+  <!-- 실행계획 -->
+  <section id="s8">
+    <div class="eyebrow e-lime">5. 실행계획</div>
+    <h2 class="kicker">정비 → 조사·평가 → 시범 → 확대 · 단계마다 넘어갈 조건을 둔다</h2>
+    <div class="grid g4">
+      <div class="step" style="background:var(--sage)"><div class="h">1단계 · 0~6개월</div><div class="big">즉시 정비</div>
+        <ul><li>데이터 품질 점검</li><li>수급률 산출</li><li>업무량 파악</li><li>시설수급자 분리 관리</li></ul>
+        <div class="f">추가 예산 거의 없음</div></div>
+      <div class="step" style="background:var(--sky)"><div class="h">2단계 · 6~18개월</div><div class="big">조사·평가</div>
+        <ul><li>기존 자활사업 성과 평가</li><li>조건부수급자 개별 평가</li><li>접근성 조사</li><li>지역 고용 여건 조사</li></ul>
+        <div class="f">확대·개선·종료 판단</div></div>
+      <div class="step" style="background:var(--peach)"><div class="h">3단계 · 2년차</div><div class="big">시범사업</div>
+        <ul><li>공동 자활·고용 상담창구</li><li>자활 연계 강화</li><li>이동식 복지 상담</li><li>사례관리 인력 보강</li></ul>
+        <div class="f">예산·인력·평가 확정이 진입 조건</div></div>
+      <div class="step" style="background:var(--peri)"><div class="h">4단계 · 3년차~</div><div class="big">확대·조정</div>
+        <ul><li>성과 기준 통과 사업만 확대</li><li>재정·조직 계획 별도 수립</li><li>운영비 사업은 비용편익 분석</li></ul>
+        <div class="f">성과 낮으면 구조 개선 또는 종료</div></div>
+    </div>
+    <div class="note">빅데이터 기반 사각지대 탐지는 시범 대상에서 제외 — 개인정보 영향평가 · 최소수집 · 보관기간 · 오탐 검증 기준 마련 후 검토한다.</div>
+  </section>
+
+  <!-- 성과지표 -->
+  <section id="s9">
+    <div class="eyebrow e-salmon">6~7. 성과지표와 추가 필요 자료</div>
+    <h2 class="kicker">측정할 수 있게 다시 쓴 지표</h2>
+    <table>
+      <tr><th>지표</th><th>기준선</th><th>주기</th><th>함께 볼 부작용 지표</th></tr>
+      <tr><td>조건부수급자 자활 참여율</td><td>1단계 산출 (분모 1,598명)</td><td>분기</td><td>중도 탈락률 · 참여 강제 민원</td></tr>
+      <tr><td>탈수급 후 12개월 고용 유지율</td><td>2단계 평가에서 산출</td><td>연</td><td>재수급률 · 탈수급 후 소득 변화</td></tr>
+      <tr><td>사례관리 업무량</td><td>1단계 산출</td><td>반기</td><td>상담 대기시간</td></tr>
+      <tr><td>위기가구 발굴 건수</td><td>현재 실적</td><td>분기</td><td>발굴 후 미지원 · 오탐 민원</td></tr>
+      <tr><td>접근성(평균 상담 이동시간)</td><td>2단계 조사에서 산출</td><td>연</td><td>이동상담 1회당 비용</td></tr>
+    </table>
+    <div class="cta">탈수급률은 단독 목표로 쓰지 않는다 — 권리 보장보다 자격 종료를 우선하게 될 수 있다.</div>
+    <div class="grid g2">
+      <div class="ribbon"><div class="t">필수 자료</div><div class="b b-lime">읍면동 인구·세대수 / 실제 2020~2024년 수급자 / 자활사업 성과 / 사업별 비용·재원 / 맞춤형복지팀 인력</div></div>
+      <div class="ribbon"><div class="t">선택 자료</div><div class="b b-steel">교통·이동시간 / 지역 고용 구조 / 시설별 정원·입소 전 거주지 / 중기 재정 전망</div></div>
+    </div>
+  </section>
+
+  <!-- 결론 -->
+  <section id="s10" style="padding:0;border-bottom:none">
+    <div class="dark">
+      <div style="display:flex;gap:16px;align-items:flex-start;flex-wrap:wrap">
+        <div class="q" style="flex:1;min-width:260px">복지계획의 목표는 수급자 수를 줄이는 것이 아니라,<br>필요한 주민이 적절한 지원을 받고<br>안정된 생활을 이어 가게 하는 것이다.</div>
+        <div class="seal">FINAL<br>REPORT<br>v2</div>
+      </div>
+      <div class="grid g2" style="margin-top:20px">
+        <div class="card"><b>01 · 진단 범위</b>2024년 원본 자료로만 현황을 진단하고, 시계열 판단은 실제 자료 확보 뒤로 미룬다.</div>
+        <div class="card"><b>02 · 우선순위</b>규모 · 조건부 비중 · 수급률을 함께 보고 지역 우선순위를 정한다.</div>
+        <div class="card"><b>03 · 추진 순서</b>정비 → 조사·평가 → 시범 → 확대, 단계마다 넘어갈 조건을 둔다.</div>
+        <div class="card"><b>04 · 성과 관점</b>기준선 있는 지표로 측정하고, 탈수급 이후의 생활 안정을 함께 본다.</div>
+      </div>
+      <p class="small" style="margin-top:16px;color:var(--yellow)">다음 단계: 읍면동별 주민등록인구 확보 → 재가 수급률 산출 → 유형 재분류 → 시범지역 확정</p>
+    </div>
+  </section>
+
+  <footer>
+    <a href="#s0">맨 위로</a> · 서귀포시 읍면동별 기초생활보장 수급 현황 진단 및 취약계층 지원 계획(최종 보고서) · 2026-10-15<br>
+    <span class="cap">출처: 서귀포시 기초생활보장수급자 현황(공공데이터, 2024-04-30 기준). 2020~2025년 수치는 교육용 가상데이터로 분석에서 제외.</span>
+  </footer>
+
+</div></div>
+
+<script>
+const DATA=[
+ {n:"동홍동",v:1518,r:15.5},{n:"대정읍",v:1203,r:13.3},{n:"성산읍",v:1024,r:10.6},
+ {n:"남원읍",v:917,r:16.4},{n:"대천동",v:825,r:15.9},{n:"표선면",v:608,r:17.6},
+ {n:"대륜동",v:560,r:20.9},{n:"서홍동",v:549,r:19.2},{n:"중문동",v:480,r:15.7},
+ {n:"중앙동",v:464,r:21.1},{n:"안덕면",v:461,r:12.1},{n:"효돈동",v:415,r:20.0},
+ {n:"천지동",v:403,r:13.9},{n:"영천동",v:240,r:9.8},{n:"정방동",v:218,r:19.7},
+ {n:"송산동",v:193,r:17.1},{n:"예래동",v:159,r:15.7}
+];
+const TINTS=["#8e8a25","#b3bd95","#d77a7a","#e6915d","#c0d4a7","#9ab6c8","#a5b8c0","#8c9ae0"];
+const box=document.getElementById('bars'),cap=document.getElementById('caption');
+const bS=document.getElementById('btnSize'),bR=document.getElementById('btnRatio');
+function render(mode){
+  const rows=[...DATA].sort((a,b)=> mode==='v'? b.v-a.v : b.r-a.r);
+  const max=mode==='v'?rows[0].v:25;
+  box.innerHTML=rows.map((d,i)=>{
+    const val=mode==='v'?d.v:d.r;
+    const hi=mode==='r'&&d.r>15.70;
+    return `<div class="bar"><div class="n">${d.n}</div>
+      <div class="track"><div class="fill" data-w="${(val/max*100).toFixed(1)}"
+        style="background:${hi?'#e91d2a':TINTS[i%8]}"></div></div>
+      <div class="v">${mode==='v'?val.toLocaleString():val.toFixed(1)+'%'}</div></div>`;
+  }).join('');
+  requestAnimationFrame(()=>box.querySelectorAll('.fill').forEach(f=>f.style.width=f.dataset.w+'%'));
+  cap.textContent = mode==='v'
+    ? "상위 5개 지역(동홍동·대정읍·성산읍·남원읍·대천동) 합계 5,487명 = 53.6%."
+    : "빨간 막대 = 시 평균(15.70%) 초과 지역. 규모 1~3위(동홍동·대정읍·성산읍)는 평균 이하로 내려간다.";
+  bS.classList.toggle('on',mode==='v');bR.classList.toggle('on',mode==='r');
+}
+bS.onclick=()=>render('v');bR.onclick=()=>render('r');render('v');
+
+const links=[...document.querySelectorAll('#nav a')];
+const obs=new IntersectionObserver(es=>es.forEach(e=>{
+  if(e.isIntersecting){links.forEach(a=>a.classList.toggle('on',a.getAttribute('href')==='#'+e.target.id));}
+}),{rootMargin:'-20% 0px -70% 0px'});
+document.querySelectorAll('section').forEach(s=>obs.observe(s));
+</script>
+</body>
+</html>
